@@ -339,9 +339,9 @@ qq.FileUploaderBasic.prototype = {
         return this._filesInProgress;
     },
     uploadStoredFiles: function(){
-        for (var i = 0; i < this._storedFileIds.length; i++) {
+        while(this._storedFileIds.length) {
             this._filesInProgress++;
-            this._handler.upload(this._storedFileIds[i], this._options.params);
+            this._handler.upload(this._storedFileIds.shift(), this._options.params);
         }
     },
     clearStoredFiles: function(){
@@ -389,11 +389,6 @@ qq.FileUploaderBasic.prototype = {
                 self._options.onComplete(id, fileName, result);
             },
             onCancel: function(id, fileName){
-                var indexToRemove = qq.indexOf(self._storedFileIds, id);
-                if (indexToRemove >= 0) {
-                    self._storedFileIds.splice(indexToRemove, 1);
-                }
-
                 self._onCancel(id, fileName);
                 self._options.onCancel(id, fileName);
             },
@@ -427,14 +422,10 @@ qq.FileUploaderBasic.prototype = {
     _onProgress: function(id, fileName, loaded, total){
     },
     _onComplete: function(id, fileName, result){
-        var indexToRemove = qq.indexOf(this._storedFileIds, id);
-        if (indexToRemove >= 0) {
-            this._storedFileIds.splice(indexToRemove, 1);
-        }
         this._filesInProgress--;
     },
     _onCancel: function(id, fileName){
-        if (this._options.autoUpload) {
+        if (this._options.autoUpload || qq.indexOf(this._storedFileIds, id) < 0) {
             this._filesInProgress--;
         }
     },
