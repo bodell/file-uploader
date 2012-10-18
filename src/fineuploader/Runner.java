@@ -12,38 +12,38 @@ import org.slf4j.LoggerFactory;
 
 public class Runner
 {
-	final static Logger log = LoggerFactory.getLogger(Runner.class);
+    final static Logger log = LoggerFactory.getLogger(Runner.class);
 
-	public static void main(String[] args) throws Exception
-	{
-		Server server = new Server();
+    public static void main(String[] args) throws Exception
+    {
+        Server server = new Server();
 
-		Connector connector = new SelectChannelConnector();
+        Connector connector = new SelectChannelConnector();
 
         String appPackage = System.getProperty("tapestry.app-package");
 
         connector.setPort(8080);
 
-		server.setConnectors(new Connector[]{connector/*, sslConnector*/});
+        server.setConnectors(new Connector[]{connector/*, sslConnector*/});
 
-		WebAppContext context = new WebAppContext();
-		context.setContextPath("/");
-		context.setWar("web");
-		context.setInitParameter(SessionManager.__CheckRemoteSessionEncoding, "true"); // Stops Jetty from adding 'jsessionid' URL rewriting into non-local URLs (e.g. Google OpenId redirects)
+        WebAppContext context = new WebAppContext();
+        context.setContextPath("/");
+        context.setResourceBase(System.getProperty("user.dir"));
+        context.setInitParameter(SessionManager.__CheckRemoteSessionEncoding, "true"); // Stops Jetty from adding 'jsessionid' URL rewriting into non-local URLs (e.g. Google OpenId redirects)
 
-		server.setHandler(context);
+        server.setHandler(context);
 
-		server.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener()
-		{
-			@Override
-			public void lifeCycleStarted(LifeCycle event)
-			{
-				log.warn("Jetty ready to accept requests...");
-			}
-		});
+        server.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener()
+        {
+            @Override
+            public void lifeCycleStarted(LifeCycle event)
+            {
+                log.warn("Jetty ready to accept requests...");
+            }
+        });
 
-		server.start();
+        server.start();
 
-		server.join();
-	}
+        server.join();
+    }
 }
